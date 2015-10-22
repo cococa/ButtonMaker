@@ -2,6 +2,7 @@ package com.cocoa.bm;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.function.DoubleConsumer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +19,12 @@ import com.cocoa.bm.bean.Gradient;
 import com.cocoa.bm.bean.Gradient.TYPE;
 
 public class Test {
+	private static Document document;
+	
+	private static String[]  fileName =  {"btn_grey_pressed","btn_grey_pressed","btn_grey_normal"};
+	private static String  mainFileName ="btn_grey";
+	
+
 	public static void main(String[] aStrings) throws Exception {
 
 		// <?xml version="1.0" encoding="UTF-8"?>
@@ -33,7 +40,7 @@ public class Test {
 
 		DocumentBuilder build = factory.newDocumentBuilder();
 
-		Document document = build.newDocument();
+		document = build.newDocument();
 
 		Element rootElement = document.createElement("shape");
 
@@ -76,13 +83,53 @@ public class Test {
 
 		Transformer transformer = tf.newTransformer();
 		DOMSource source = new DOMSource(document);
-		// transformer.setOutputProperty(OutputKeys.ENCODING, "gb2312");
-		// transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		PrintWriter pw = new PrintWriter(new FileOutputStream("C:\\Users\\Administrator\\Desktop\\test.xml"));
+		PrintWriter pw = new PrintWriter(new FileOutputStream("C:\\Users\\Administrator\\Desktop\\"+fileName[0]+".xml"));
 		StreamResult result = new StreamResult(pw);
 		transformer.transform(source, result);
-		System.out.println("生成XML文件成功!");
+		
+		
+		
+		createFile();
 
+	}
+
+	public static void createFile() throws Exception{
+		// <?xml version="1.0" encoding="UTF-8"?>
+		// -<selector
+		// xmlns:android="http://schemas.android.com/apk/res/android"> <item
+		// android:drawable="@drawable/btn_grey_pressed"
+		// android:state_pressed="true"/> <item
+		// android:drawable="@drawable/btn_grey_pressed"
+		// android:state_focused="true"/> <item
+		// android:drawable="@drawable/btn_grey_normal"/> </selector>
+		
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		DocumentBuilder build = factory.newDocumentBuilder();
+
+		Document  maindocument = build.newDocument();
+
+		
+		Element rootElement = maindocument.createElement("selector");
+		rootElement.setAttribute("xmlns:android", "http://schemas.android.com/apk/res/android");
+
+		for (int i = 0; i < 3; i++) {
+			Element e = maindocument.createElement("item");
+			e.setAttribute("android:drawable", "@drawable/"+fileName[i]);
+			e.setAttribute("android:state_pressed", true+"");
+			rootElement.appendChild(e);
+		}
+		
+		maindocument.appendChild(rootElement);
+		
+		TransformerFactory tf = TransformerFactory.newInstance();
+
+		Transformer transformer = tf.newTransformer();
+		DOMSource source = new DOMSource(maindocument);
+		PrintWriter pw = new PrintWriter(new FileOutputStream("C:\\Users\\Administrator\\Desktop\\"+mainFileName+".xml"));
+		StreamResult result = new StreamResult(pw);
+		transformer.transform(source, result);
+	
 	}
 
 }
